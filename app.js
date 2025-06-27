@@ -58,6 +58,17 @@ const departmentCostCenterRoutes = require('./routes/departmentCostCenter');
 const departmentCostInputRoutes = require('./routes/departmentCostInput');
 const majorInvestmentAnalysisRoutes = require('./routes/majorInvestmentAnalysis');
 
+// 权限系统路由
+const permissionsRoutes = require('./routes/permissions');
+const userManagementRoutes = require('./routes/userManagement');
+const dashboardRoutes = require('./routes/dashboard');
+
+// 认证路由
+const authRoutes = require('./routes/auth');
+
+// 表单提交路由
+const formSubmissionsRoutes = require('./routes/formSubmissions');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -121,6 +132,17 @@ app.use('/production-execution', productionExecutionRoutes);
 app.use('/department-cost-center', departmentCostCenterRoutes);
 app.use('/department-cost-input', departmentCostInputRoutes);
 app.use('/major-investment-analysis', majorInvestmentAnalysisRoutes);
+
+// 权限系统路由
+app.use('/permissions', permissionsRoutes);
+app.use('/users', userManagementRoutes);
+app.use('/dashboard', dashboardRoutes);
+
+// 认证路由
+app.use('/auth', authRoutes);
+
+// 表单提交路由
+app.use('/forms', formSubmissionsRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

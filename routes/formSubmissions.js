@@ -74,7 +74,7 @@ router.post('/submit', async (req, res) => {
           WHERE module_id = ? AND period = ?
         `, [JSON.stringify(formData), userId, newCount, remarks || null, suggestions || null, moduleId, period]);
         
-        action = 'updated';
+        action = 'update';
       } else {
         // 插入新记录
         const [result] = await connection.execute(`
@@ -83,7 +83,7 @@ router.post('/submit', async (req, res) => {
         `, [moduleId, period, JSON.stringify(formData), userId, remarks || null, suggestions || null]);
         
         submissionId = result.insertId;
-        action = 'created';
+        action = 'create';
       }
       
       // 记录历史
@@ -96,7 +96,7 @@ router.post('/submit', async (req, res) => {
       
       res.json({
         success: true,
-        message: action === 'created' ? '表单提交成功' : '表单更新成功',
+        message: action === 'create' ? '表单提交成功' : '表单更新成功',
         data: {
           submission_id: submissionId,
           action: action

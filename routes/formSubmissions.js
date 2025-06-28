@@ -17,7 +17,7 @@ const pool = mysql.createPool({
 // 提交表单数据 (系统级别)
 router.post('/submit', async (req, res) => {
   try {
-    const { userId, moduleId, period, formData } = req.body;
+    const { userId, moduleId, period, formData, remarks, suggestions } = req.body;
     
     // 验证必填字段
     if (!userId || !moduleId || !period) {
@@ -70,17 +70,17 @@ router.post('/submit', async (req, res) => {
         
         await connection.execute(`
           UPDATE form_submissions 
-          SET submission_data = ?, last_submitted_by = ?, updated_at = NOW(), submission_count = ?
+          SET submission_data = ?, last_submitted_by = ?, updated_at = NOW(), submission_count = ?, remarks = ?, suggestions = ?
           WHERE module_id = ? AND period = ?
-        `, [JSON.stringify(formData), userId, newCount, moduleId, period]);
+        `, [JSON.stringify(formData), userId, newCount, remarks || null, suggestions || null, moduleId, period]);
         
         action = 'updated';
       } else {
         // 插入新记录
         const [result] = await connection.execute(`
-          INSERT INTO form_submissions (module_id, period, submission_data, last_submitted_by, submission_count)
-          VALUES (?, ?, ?, ?, 1)
-        `, [moduleId, period, JSON.stringify(formData), userId]);
+          INSERT INTO form_submissions (module_id, period, submission_data, last_submitted_by, submission_count, remarks, suggestions)
+          VALUES (?, ?, ?, ?, 1, ?, ?)
+        `, [moduleId, period, JSON.stringify(formData), userId, remarks || null, suggestions || null]);
         
         submissionId = result.insertId;
         action = 'created';
@@ -88,9 +88,9 @@ router.post('/submit', async (req, res) => {
       
       // 记录历史
       await connection.execute(`
-        INSERT INTO form_submission_history (module_id, period, submitted_by, submission_data, action_type)
-        VALUES (?, ?, ?, ?, ?)
-      `, [moduleId, period, userId, JSON.stringify(formData), action]);
+        INSERT INTO form_submission_history (module_id, period, submitted_by, submission_data, action_type, remarks, suggestions)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, [moduleId, period, userId, JSON.stringify(formData), action, remarks || null, suggestions || null]);
       
       await connection.commit();
       
@@ -143,9 +143,14 @@ router.get('/submission/:moduleId/:period', async (req, res) => {
     // 解析JSON数据
     if (submission.submission_data) {
       try {
-        submission.submission_data = JSON.parse(submission.submission_data);
+        // 如果已经是对象就不需要解析
+        if (typeof submission.submission_data === 'string') {
+          submission.submission_data = JSON.parse(submission.submission_data);
+        }
       } catch (e) {
         console.warn('解析submission_data失败:', e);
+        // 如果解析失败，设置为空对象
+        submission.submission_data = {};
       }
     }
     

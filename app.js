@@ -69,6 +69,9 @@ const authRoutes = require('./routes/auth');
 // 表单提交路由
 const formSubmissionsRoutes = require('./routes/formSubmissions');
 
+// 文件上传路由
+const fileUploadRoutes = require('./routes/fileUpload');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -143,6 +146,9 @@ app.use('/auth', authRoutes);
 
 // 表单提交路由
 app.use('/forms', formSubmissionsRoutes);
+
+// 文件上传路由
+app.use('/files', fileUploadRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

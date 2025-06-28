@@ -144,15 +144,9 @@ router.get('/announcements', async (req, res) => {
   try {
     // 模拟公告数据 - 在实际应用中应该从数据库获取
     const announcements = [
+     
       {
         id: 1,
-        title: '系统升级通知',
-        content: '系统已升级为新的提交逻辑，每个表单在系统中全局唯一，支持多人协作编辑。',
-        type: 'info',
-        created_at: new Date().toISOString()
-      },
-      {
-        id: 2,
         title: '月度报表提醒',
         content: '请及时完成本月度的各项表单填报工作。',
         type: 'warning',

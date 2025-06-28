@@ -1,52 +1,75 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 
 // 获取所有用户列表
 router.get('/', async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = '' } = req.query;
-    const offset = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const limitNum = parseInt(req.query.limit) || 10;
+    const offsetNum = (page - 1) * limitNum;
+    const search = req.query.search;
 
-    let whereClause = '';
-    let params = [];
+    let sql, params;
     
-    if (search) {
-      whereClause = 'WHERE u.username LIKE ? OR u.email LIKE ?';
-      params = [`%${search}%`, `%${search}%`];
-    }
-
-    // 获取用户总数
-    const [countRows] = await pool.execute(`
-      SELECT COUNT(*) as total 
-      FROM users u 
-      LEFT JOIN user_roles ur ON u.role_id = ur.id 
-      ${whereClause}
-    `, params);
-
-    // 获取用户列表
-    const [userRows] = await pool.execute(`
+    // 构建基本 SQL
+    let baseCountSQL = "SELECT COUNT(*) as total FROM users u LEFT JOIN user_roles ur ON u.role_id = ur.id";
+    let baseSelectSQL = `
       SELECT u.id, u.username, u.email, u.created_at, u.updated_at,
-             ur.id as role_id, ur.role_name, ur.role_description
+             u.role_id, ur.role_name, ur.role_description
       FROM users u 
-      LEFT JOIN user_roles ur ON u.role_id = ur.id 
-      ${whereClause}
-      ORDER BY u.created_at DESC
-      LIMIT ? OFFSET ?
-    `, [...params, parseInt(limit), parseInt(offset)]);
-
-    res.json({
-      success: true,
-      data: {
-        users: userRows,
-        pagination: {
-          current_page: parseInt(page),
-          per_page: parseInt(limit),
-          total: countRows[0].total,
-          total_pages: Math.ceil(countRows[0].total / limit)
+      LEFT JOIN user_roles ur ON u.role_id = ur.id`;
+    
+    // 根据是否有搜索条件构建不同的 SQL
+    if (search && search.trim() !== '') {
+      const whereClause = "WHERE u.username LIKE ? OR u.email LIKE ?";
+      const searchParams = [`%${search}%`, `%${search}%`];
+      
+      // 获取用户总数
+      const [countRows] = await pool.execute(`${baseCountSQL} ${whereClause}`, searchParams);
+      
+      // 获取用户列表
+      const [userRows] = await pool.execute(
+        `${baseSelectSQL} ${whereClause} ORDER BY u.created_at DESC LIMIT ? OFFSET ?`, 
+        [...searchParams, limitNum, offsetNum]
+      );
+      
+      return res.json({
+        success: true,
+        data: {
+          users: userRows,
+          pagination: {
+            current_page: page,
+            per_page: limitNum,
+            total: countRows[0].total,
+            total_pages: Math.ceil(countRows[0].total / limitNum)
+          }
         }
-      }
-    });
+      });
+    } else {
+      // 没有搜索条件时的简单查询
+      // 获取用户总数
+      const [countRows] = await pool.execute(baseCountSQL);
+      
+      // 获取用户列表 - 为避免参数问题，将参数直接嵌入到 SQL 中
+      const [userRows] = await pool.execute(
+        `${baseSelectSQL} ORDER BY u.created_at DESC LIMIT ${limitNum} OFFSET ${offsetNum}`
+      );
+      
+      return res.json({
+        success: true,
+        data: {
+          users: userRows,
+          pagination: {
+            current_page: page,
+            per_page: limitNum,
+            total: countRows[0].total,
+            total_pages: Math.ceil(countRows[0].total / limitNum)
+          }
+        }
+      });
+    }
   } catch (error) {
     console.error('获取用户列表失败:', error);
     res.status(500).json({ error: '获取用户列表失败' });
@@ -99,7 +122,7 @@ router.get('/:userId', async (req, res) => {
 // 创建新用户
 router.post('/', async (req, res) => {
   try {
-    const { username, email, password, roleId } = req.body;
+    const { username, email, password, role_id } = req.body;
 
     // 验证必填字段
     if (!username || !email || !password) {
@@ -116,10 +139,12 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: '用户名或邮箱已存在' });
     }
 
-    // 创建用户（实际应用中应该对密码进行哈希处理）
+    // 对密码进行哈希处理
+    const hashedPassword = await bcrypt.hash(password, 12);
+    
     const [result] = await pool.execute(
       'INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)',
-      [username, email, password, roleId || null]
+      [username, email, hashedPassword, role_id || null]
     );
 
     res.json({
@@ -139,7 +164,7 @@ router.post('/', async (req, res) => {
 router.put('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { username, email, roleId } = req.body;
+    const { username, email, role_id } = req.body;
 
     // 检查用户是否存在
     const [existingUser] = await pool.execute('SELECT id FROM users WHERE id = ?', [userId]);
@@ -171,9 +196,9 @@ router.put('/:userId', async (req, res) => {
       updateFields.push('email = ?');
       updateValues.push(email);
     }
-    if (roleId !== undefined) {
+    if (role_id !== undefined) {
       updateFields.push('role_id = ?');
-      updateValues.push(roleId);
+      updateValues.push(role_id);
     }
 
     if (updateFields.length === 0) {
@@ -234,10 +259,12 @@ router.post('/:userId/reset-password', async (req, res) => {
       return res.status(400).json({ error: '新密码不能为空' });
     }
 
-    // 实际应用中应该对密码进行哈希处理
+    // 对新密码进行哈希处理
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
     const [result] = await pool.execute(
       'UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [newPassword, userId]
+      [hashedPassword, userId]
     );
 
     if (result.affectedRows === 0) {
@@ -257,7 +284,7 @@ router.post('/:userId/reset-password', async (req, res) => {
 // 批量更新用户角色
 router.post('/batch-update-role', async (req, res) => {
   try {
-    const { userIds, roleId } = req.body;
+    const { userIds, role_id } = req.body;
 
     if (!Array.isArray(userIds) || userIds.length === 0) {
       return res.status(400).json({ error: '用户ID列表不能为空' });
@@ -266,7 +293,7 @@ router.post('/batch-update-role', async (req, res) => {
     const placeholders = userIds.map(() => '?').join(',');
     const [result] = await pool.execute(
       `UPDATE users SET role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id IN (${placeholders})`,
-      [roleId, ...userIds]
+      [role_id, ...userIds]
     );
 
     res.json({

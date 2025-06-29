@@ -57,6 +57,7 @@ const productionExecutionRoutes = require('./routes/productionExecution');
 const departmentCostCenterRoutes = require('./routes/departmentCostCenter');
 const departmentCostInputRoutes = require('./routes/departmentCostInput');
 const majorInvestmentAnalysisRoutes = require('./routes/majorInvestmentAnalysis');
+const budgetExecutionRoutes = require('./routes/budgetExecution');
 
 // 权限系统路由
 const permissionsRoutes = require('./routes/permissions');
@@ -135,6 +136,7 @@ app.use('/production-execution', productionExecutionRoutes);
 app.use('/department-cost-center', departmentCostCenterRoutes);
 app.use('/department-cost-input', departmentCostInputRoutes);
 app.use('/major-investment-analysis', majorInvestmentAnalysisRoutes);
+app.use('/budget-execution', budgetExecutionRoutes);
 
 // 权限系统路由
 app.use('/permissions', permissionsRoutes);

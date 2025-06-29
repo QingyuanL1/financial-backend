@@ -1,0 +1,32 @@
+
+> financial-backend@1.0.0 start
+> node app.js
+
+[dotenv@16.6.0] injecting env (6) from .env
+[dotenv@16.6.0] injecting env (6) from .env
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1898:16)
+    at listenInCluster (node:net:1946:12)
+    at Server.listen (node:net:2044:7)
+    at Function.listen (/Users/yaowenya/Desktop/大亚发展集团/financial-backend/node_modules/express/lib/application.js:635:24)
+    at Object.<anonymous> (/Users/yaowenya/Desktop/大亚发展集团/financial-backend/app.js:175:5)
+    at Module._compile (node:internal/modules/cjs/loader:1358:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1416:10)
+    at Module.load (node:internal/modules/cjs/loader:1208:32)
+    at Module._load (node:internal/modules/cjs/loader:1024:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:174:12)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1925:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v20.14.0

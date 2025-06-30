@@ -73,6 +73,9 @@ const formSubmissionsRoutes = require('./routes/formSubmissions');
 // 文件上传路由
 const fileUploadRoutes = require('./routes/fileUpload');
 
+// 数据分析路由
+const analyticsRoutes = require('./routes/analytics');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -151,6 +154,9 @@ app.use('/forms', formSubmissionsRoutes);
 
 // 文件上传路由
 app.use('/files', fileUploadRoutes);
+
+// 数据分析路由
+app.use('/analytics', analyticsRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

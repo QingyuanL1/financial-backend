@@ -76,6 +76,9 @@ const fileUploadRoutes = require('./routes/fileUpload');
 // 数据分析路由
 const analyticsRoutes = require('./routes/analytics');
 
+// 通知管理路由
+const notificationsRoutes = require('./routes/notifications');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -157,6 +160,9 @@ app.use('/files', fileUploadRoutes);
 
 // 数据分析路由
 app.use('/analytics', analyticsRoutes);
+
+// 通知管理路由
+app.use('/notifications', notificationsRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 
 // 获取成本暂估入库和计提情况数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('cost_estimate_personnel_withdrawals'), async (req, res) => {
     try {
         const { period } = req.params;
         
@@ -23,9 +24,34 @@ router.get('/:period', async (req, res) => {
         const [rows] = await pool.execute(query, [period]);
         
         if (rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: '未找到指定期间的数据' 
+            // 没有数据时，返回空的数据结构，让中间件填充预算数据
+            const data = {
+                equipment: [
+                    { customerType: '上海', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '国网', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '江苏', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '输配电内配', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '西门子', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '同业', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '用户', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '其它', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 }
+                ],
+                component: [
+                    { customerType: '用户', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 }
+                ],
+                project: [
+                    { customerType: '一包', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '二包', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '域内合作', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '域外合作', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 },
+                    { customerType: '其它', initialBalance: 0, newAddition: 0, yearTotal: 0, provisionRate: 0 }
+                ]
+            };
+            
+            return res.json({
+                success: true,
+                data: data,
+                period: period
             });
         }
         

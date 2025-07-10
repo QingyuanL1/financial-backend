@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 
 // 获取库存情况（合同存量）数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('contract_inventory'), async (req, res) => {
     try {
         const { period } = req.params;
         

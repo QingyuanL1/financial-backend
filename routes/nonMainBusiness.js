@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取非主营业务情况数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('non_main_business'), async (req, res) => {
     const { period } = req.params;
     
     // 验证period格式 (YYYY-MM)
@@ -21,9 +22,22 @@ router.get('/:period', async (req, res) => {
             return res.status(404).json({ error: '未找到指定期间的数据' });
         }
         
+        console.log('非主营业务数据类型:', typeof rows[0].data);
+        console.log('非主营业务数据内容:', rows[0].data);
+        
+        // 解析JSON字符串数据
+        let parsedData;
+        try {
+            parsedData = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
+            console.log('解析后的数据:', parsedData);
+        } catch (e) {
+            console.error('JSON解析失败:', e);
+            parsedData = rows[0].data;
+        }
+        
         res.json({
             success: true,
-            data: rows[0].data,
+            data: parsedData,
             period: rows[0].period,
             updated_at: rows[0].updated_at
         });

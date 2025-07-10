@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取指定期间的部门成本中心计入损益情况
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('department_cost_center_profit_loss'), async (req, res) => {
   try {
     const { period } = req.params;
 
@@ -17,7 +18,34 @@ router.get('/:period', async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: '未找到指定期间的数据' });
+      // 没有数据时，返回空的数据结构，让中间件填充预算数据
+      const emptyData = {
+        departments: [
+          { department: '总经理室', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '企管部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '财务部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '销售部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '市场部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '营运部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '研技部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: 'C-GIS 事业部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '工程事业部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' }
+        ],
+        total: {
+          department: '合计',
+          yearlyBudget: '',
+          currentTotal: '',
+          executionProgress: '',
+          budgetToOutputRatio: '',
+          actualToOutputRatio: ''
+        }
+      };
+      
+      return res.json({
+        success: true,
+        data: emptyData,
+        period: period
+      });
     }
 
     res.json({

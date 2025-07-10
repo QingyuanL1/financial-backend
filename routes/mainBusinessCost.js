@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 
 // 获取主营业务成本结构与质量数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('main_business_cost_structure'), async (req, res) => {
     try {
         const { period } = req.params;
         

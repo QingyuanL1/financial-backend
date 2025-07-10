@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取指定期间的主营业务收入分解情况数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('main_business_income_breakdown'), async (req, res) => {
   try {
     const { period } = req.params;
     

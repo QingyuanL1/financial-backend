@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 
 // 获取在产情况数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('work_in_progress'), async (req, res) => {
     try {
         const { period } = req.params;
         
@@ -23,9 +24,34 @@ router.get('/:period', async (req, res) => {
         const [rows] = await pool.execute(query, [period]);
         
         if (rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: '未找到指定期间的数据' 
+            // 没有数据时，返回空的数据结构，让中间件填充预算数据
+            const data = {
+                equipment: [
+                    { customerType: '上海', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '国网', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '江苏', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '输配电内配', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '西门子', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '同业', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '用户', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '其它', initialAmount: 0, currentAmount: 0 }
+                ],
+                component: [
+                    { customerType: '用户', initialAmount: 0, currentAmount: 0 }
+                ],
+                project: [
+                    { customerType: '一包', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '二包', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '域内合作', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '域外合作', initialAmount: 0, currentAmount: 0 },
+                    { customerType: '其它', initialAmount: 0, currentAmount: 0 }
+                ]
+            };
+            
+            return res.json({
+                success: true,
+                data: data,
+                period: period
             });
         }
         

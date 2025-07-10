@@ -1,0 +1,202 @@
+{
+  "timestamp": "2025-07-09T11:27:06.983Z",
+  "summary": {
+    "total": 23,
+    "success": 8,
+    "noBudget": 15,
+    "noData": 0,
+    "error": 0
+  },
+  "results": [
+    {
+      "tableKey": "new_orders",
+      "name": "新签订单结构与质量",
+      "route": "new-orders",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 30000,
+        "currentTotal": 5593,
+        "progress": 0
+      }
+    },
+    {
+      "tableKey": "project_tracking",
+      "name": "项目跟踪情况",
+      "route": "project-tracking",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 500000,
+        "currentTotal": 869.12,
+        "progress": 0.17
+      }
+    },
+    {
+      "tableKey": "business_income_structure",
+      "name": "营业收入结构与质量",
+      "route": "business-income",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 59400,
+        "currentTotal": 514
+      }
+    },
+    {
+      "tableKey": "main_business_income_breakdown",
+      "name": "主营业务收入分解",
+      "route": "main-business-income",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 22000,
+        "currentTotal": 2398.99,
+        "progress": "10.90%"
+      }
+    },
+    {
+      "tableKey": "current_year_order_to_income",
+      "name": "当年订单转收入",
+      "route": "order-to-income",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 5593.15,
+        "currentTotal": 2000,
+        "progress": "0.00%"
+      }
+    },
+    {
+      "tableKey": "stock_order_to_income",
+      "name": "存量订单转收入",
+      "route": "stock-order-to-income",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 39050.53,
+        "currentTotal": 999,
+        "progress": "0.00%"
+      }
+    },
+    {
+      "tableKey": "non_main_business",
+      "name": "非主营业务",
+      "route": "non-main-business",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": 1222,
+        "currentTotal": 33
+      }
+    },
+    {
+      "tableKey": "inventory_structure_quality",
+      "name": "库存结构质量",
+      "route": "inventory-structure",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "bid_fulfillment_status",
+      "name": "标书履约状况",
+      "route": "bid-fulfillment",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "work_in_progress",
+      "name": "在制品",
+      "route": "inventory-in-progress",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "contract_inventory",
+      "name": "合同库存",
+      "route": "contract-inventory",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "main_business_cost_structure",
+      "name": "主营业务成本结构",
+      "route": "main-business-cost",
+      "status": "success",
+      "sampleData": {
+        "yearlyPlan": "1000",
+        "currentTotal": 1000
+      }
+    },
+    {
+      "tableKey": "department_cost_center_profit_loss",
+      "name": "部门成本中心盈亏",
+      "route": "department-cost-input",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "main_business_contribution_rate_structure",
+      "name": "主营业务贡献率结构",
+      "route": "business-contribution",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "cost_estimate_personnel_withdrawals",
+      "name": "成本估算人员提取",
+      "route": "cost-estimation",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "main_business_gross_profit_rate_structure",
+      "name": "主营业务毛利率结构",
+      "route": "business-profit-margin",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "net_profit_structure_quality",
+      "name": "净利润结构质量",
+      "route": "net-profit-structure",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "main_business_net_profit_contribution",
+      "name": "主营业务净利润贡献",
+      "route": "main-business-net-profit",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "non_main_business_net_profit_contribution",
+      "name": "非主营业务净利润贡献",
+      "route": "non-main-business-net-profit",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "payment_structure_quality",
+      "name": "回款结构质量",
+      "route": "receipt-structure",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "accounts_receivable_situation",
+      "name": "应收账款情况",
+      "route": "accounts-receivable",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "overdue_accounts_receivable_situation",
+      "name": "逾期应收账款情况",
+      "route": "overdue-receivables",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    },
+    {
+      "tableKey": "bad_debt_provision_situation",
+      "name": "坏账准备情况",
+      "route": "bad-debt-provision",
+      "status": "no_budget",
+      "message": "预算数据未附加"
+    }
+  ]
+}

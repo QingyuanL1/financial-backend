@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
 const router = express.Router();
+const { attachBusinessIncomeBudget } = require('../middleware/budgetMiddleware');
 
 // 获取指定期间的营业收入结构与质量数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', attachBusinessIncomeBudget, async (req, res) => {
   try {
     const { period } = req.params;
     

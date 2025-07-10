@@ -79,6 +79,9 @@ const analyticsRoutes = require('./routes/analytics');
 // 通知管理路由
 const notificationsRoutes = require('./routes/notifications');
 
+// 年度预算计划路由
+const budgetPlanningRoutes = require('./routes/budgetPlanning');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -163,6 +166,9 @@ app.use('/analytics', analyticsRoutes);
 
 // 通知管理路由
 app.use('/notifications', notificationsRoutes);
+
+// 年度预算计划路由
+app.use('/budget-planning', budgetPlanningRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

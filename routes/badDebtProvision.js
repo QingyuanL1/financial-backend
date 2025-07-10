@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取坏账准备情况数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('bad_debt_provision_situation'), async (req, res) => {
     const { period } = req.params;
     
     // 验证period格式 (YYYY-MM)

@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取主营业务边际贡献率数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('main_business_contribution_rate_structure'), async (req, res) => {
     const { period } = req.params;
     
     // 验证period格式 (YYYY-MM)
@@ -18,7 +19,38 @@ router.get('/:period', async (req, res) => {
         );
         
         if (rows.length === 0) {
-            return res.status(404).json({ error: '未找到指定期间的数据' });
+            // 没有数据时，返回空的数据结构，让中间件填充预算数据
+            const defaultData = {
+                equipment: {
+                    shanghai: { plan: '0%', actual: '0%', difference: '0%' },
+                    national: { plan: '0%', actual: '0%', difference: '0%' },
+                    jiangsu: { plan: '0%', actual: '0%', difference: '0%' },
+                    power: { plan: '0%', actual: '0%', difference: '0%' }
+                },
+                automation: {
+                    siemens: { plan: '0%', actual: '0%', difference: '0%' },
+                    peers: { plan: '0%', actual: '0%', difference: '0%' },
+                    users: { plan: '0%', actual: '0%', difference: '0%' },
+                    others: { plan: '0%', actual: '0%', difference: '0%' }
+                },
+                components: {
+                    users: { plan: '0%', actual: '0%', difference: '0%' }
+                },
+                engineering: {
+                    package1: { plan: '0%', actual: '0%', difference: '0%' },
+                    package2: { plan: '0%', actual: '0%', difference: '0%' },
+                    domestic: { plan: '0%', actual: '0%', difference: '0%' },
+                    international: { plan: '0%', actual: '0%', difference: '0%' },
+                    others: { plan: '0%', actual: '0%', difference: '0%' }
+                },
+                total: { plan: '0%', actual: '0%', difference: '0%' }
+            };
+            
+            return res.json({
+                success: true,
+                data: defaultData,
+                period: period
+            });
         }
         
         res.json({

@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取指定期间的主营业务当年订单转收入数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('current_year_order_to_income'), async (req, res) => {
   try {
     const { period } = req.params;
     

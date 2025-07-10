@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取主营业务毛利率数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('main_business_gross_profit_rate_structure'), async (req, res) => {
     const { period } = req.params;
     
     // 验证period格式 (YYYY-MM)

@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取应收账款情况数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('accounts_receivable_situation'), async (req, res) => {
     const { period } = req.params;
     
     // 验证period格式 (YYYY-MM)

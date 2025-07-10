@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取净利润结构数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('net_profit_structure_quality'), async (req, res) => {
     const { period } = req.params;
     
     // 验证period格式 (YYYY-MM)

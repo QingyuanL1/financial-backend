@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 
 // 获取存量结构与质量数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('inventory_structure_quality'), async (req, res) => {
     try {
         const { period } = req.params;
         

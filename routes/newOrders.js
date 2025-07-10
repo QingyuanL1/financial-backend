@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
+const { attachNewOrdersBudget } = require('../middleware/budgetMiddleware');
 
 // 获取新签订单数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', attachNewOrdersBudget, async (req, res) => {
     try {
         const { period } = req.params;
         

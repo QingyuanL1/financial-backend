@@ -22,7 +22,42 @@ router.get('/:period', attachBusinessIncomeBudget, async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: '该期间的营业收入结构与质量数据不存在' });
+      // 当没有数据时，返回预算数据
+      try {
+        const year = period.split('-')[0];
+        console.log(`正在查询营业收入预算数据: period=${year}`);
+        
+        const [budgetRows] = await pool.execute(
+          'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
+          ['business_income_structure_quality', year]
+        );
+        
+        console.log('预算数据查询结果:', budgetRows);
+        
+        // 构建预算数据结构
+        const budgetData = [
+          { id: 1, category: '主营业务', yearlyPlan: 0, currentTotal: 0 },
+          { id: 2, category: '非主营业务', yearlyPlan: 0, currentTotal: 0 }
+        ];
+        
+        // 填充预算数据
+        budgetRows.forEach(row => {
+          const item = budgetData.find(item => item.category === row.customer || item.category === row.category);
+          if (item) {
+            item.yearlyPlan = parseFloat(row.yearly_budget);
+          }
+        });
+        
+        return res.json({
+          success: true,
+          data: budgetData,
+          period: period,
+          isDefault: true
+        });
+      } catch (budgetError) {
+        console.error('获取预算数据失败:', budgetError);
+        return res.status(404).json({ error: '该期间的营业收入结构与质量数据不存在' });
+      }
     }
 
     res.json({

@@ -67,9 +67,16 @@ router.get('/:period', async (req, res) => {
 // 保存年度预算计划数据
 router.post('/', async (req, res) => {
     try {
+        console.log('=== 预算保存接口调用 ===');
+        console.log('请求体:', JSON.stringify(req.body, null, 2));
+        
         const { period, data } = req.body;
         
+        console.log('period:', period);
+        console.log('data:', data);
+        
         if (!period || !data) {
+            console.log('缺少必要参数 - period:', period, 'data:', data);
             return res.status(400).json({ 
                 success: false, 
                 message: '缺少必要参数' 
@@ -77,6 +84,7 @@ router.post('/', async (req, res) => {
         }
         
         // 删除该期间的现有数据
+        console.log('删除现有数据...');
         await pool.execute('DELETE FROM budget_planning WHERE period = ?', [period]);
         
         // 准备批量插入数据
@@ -84,10 +92,15 @@ router.post('/', async (req, res) => {
         
         // 处理所有表格的修改数据
         if (data.modifications) {
+            console.log('处理modifications:', Object.keys(data.modifications));
             Object.keys(data.modifications).forEach(tableKey => {
+                console.log(`处理表格: ${tableKey}`);
                 const tableData = data.modifications[tableKey];
+                console.log(`表格数据:`, tableData);
                 tableData.forEach(categoryData => {
+                    console.log(`  类别: ${categoryData.name}, 项目数: ${categoryData.items.length}`);
                     categoryData.items.forEach(item => {
+                        console.log(`    项目: ${item.projectName}, 预算: ${item.yearlyBudget}`);
                         insertData.push([
                             period,
                             tableKey,
@@ -98,7 +111,11 @@ router.post('/', async (req, res) => {
                     });
                 });
             });
+        } else {
+            console.log('没有找到modifications数据');
         }
+        
+        console.log('准备插入数据:', insertData.length, '条');
         
         if (insertData.length > 0) {
             const placeholders = insertData.map(() => '(?, ?, ?, ?, ?)').join(', ');
@@ -107,7 +124,9 @@ router.post('/', async (req, res) => {
                 VALUES ${placeholders}
             `;
             const flattenedData = insertData.flat();
+            console.log('执行插入操作...');
             await pool.execute(insertQuery, flattenedData);
+            console.log('插入完成');
         }
         
         res.json({
@@ -117,9 +136,11 @@ router.post('/', async (req, res) => {
         });
     } catch (error) {
         console.error('保存年度预算计划数据失败:', error);
+        console.error('错误堆栈:', error.stack);
         res.status(500).json({ 
             success: false, 
-            message: '服务器内部错误' 
+            message: '服务器内部错误',
+            error: error.message
         });
     }
 });

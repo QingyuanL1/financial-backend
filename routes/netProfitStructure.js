@@ -19,12 +19,101 @@ router.get('/:period', createBudgetMiddleware('net_profit_structure_quality'), a
         );
         
         if (rows.length === 0) {
-            return res.status(404).json({ error: '未找到指定期间的数据' });
+            // 没有数据时，获取预算数据并返回默认结构
+            try {
+                const year = period.split('-')[0];
+                console.log(`正在查询预算数据: table_key=net_profit_structure_quality, period=${year}`);
+                
+                const [budgetRows] = await pool.execute(
+                    'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
+                    ['net_profit_structure_quality', year]
+                );
+                
+                console.log('预算数据查询结果:', budgetRows);
+                
+                let mainBusinessPlan = '0';
+                let nonMainBusinessPlan = '0';
+                
+                budgetRows.forEach(row => {
+                    console.log(`处理预算行: customer=${row.customer}, yearly_budget=${row.yearly_budget}`);
+                    if (row.customer === '主营业务') {
+                        mainBusinessPlan = row.yearly_budget.toString();
+                    } else if (row.customer === '非主营业务') {
+                        nonMainBusinessPlan = row.yearly_budget.toString();
+                    }
+                });
+                
+                // 计算总计划
+                const totalPlan = (parseFloat(mainBusinessPlan) + parseFloat(nonMainBusinessPlan)).toFixed(2);
+                
+                const budgetData = {
+                    mainBusiness: { plan: mainBusinessPlan, actual: '0', progress: '0.00%' },
+                    nonMainBusiness: { plan: nonMainBusinessPlan, actual: '0', progress: '0.00%' },
+                    total: { plan: totalPlan, actual: '0', progress: '0.00%' }
+                };
+                
+                console.log('最终预算数据:', budgetData);
+                
+                return res.json({
+                    success: true,
+                    data: budgetData,
+                    period: period,
+                    isDefault: true
+                });
+            } catch (budgetError) {
+                console.error('获取预算数据失败:', budgetError);
+                // 即使预算数据查询失败，也返回默认结构而不是404
+                const defaultBudgetData = {
+                    mainBusiness: { plan: '0', actual: '0', progress: '0.00%' },
+                    nonMainBusiness: { plan: '0', actual: '0', progress: '0.00%' },
+                    total: { plan: '0', actual: '0', progress: '0.00%' }
+                };
+                
+                return res.json({
+                    success: true,
+                    data: defaultBudgetData,
+                    period: period,
+                    isDefault: true
+                });
+            }
+        }
+        
+        // 有数据时，也需要确保预算数据被包含
+        let responseData = rows[0].data;
+        
+        // 如果是字符串，先解析
+        if (typeof responseData === 'string') {
+            try {
+                responseData = JSON.parse(responseData);
+            } catch (e) {
+                console.error('JSON解析失败:', e);
+            }
+        }
+        
+        // 确保预算数据存在，如果不存在则从数据库获取
+        if (!responseData.mainBusiness?.plan || responseData.mainBusiness.plan === '0') {
+            try {
+                const year = period.split('-')[0];
+                const [budgetRows] = await pool.execute(
+                    'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
+                    ['net_profit_structure_quality', year]
+                );
+                
+                budgetRows.forEach(row => {
+                    if (row.customer === '主营业务' && responseData.mainBusiness) {
+                        responseData.mainBusiness.plan = row.yearly_budget.toString();
+                    } else if (row.customer === '非主营业务' && responseData.nonMainBusiness) {
+                        responseData.nonMainBusiness.plan = row.yearly_budget.toString();
+                    }
+                });
+            } catch (budgetError) {
+                console.error('获取预算数据失败:', budgetError);
+            }
         }
         
         res.json({
             success: true,
-            data: rows[0].data,
+            data: responseData,
             period: rows[0].period,
             updated_at: rows[0].updated_at
         });

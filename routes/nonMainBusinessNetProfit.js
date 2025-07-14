@@ -19,7 +19,46 @@ router.get('/:period', createBudgetMiddleware('non_main_business_net_profit_cont
         );
         
         if (rows.length === 0) {
-            return res.status(404).json({ error: '未找到指定期间的数据' });
+            // 当没有数据时，返回预算数据
+            try {
+                const year = period.split('-')[0];
+                console.log(`正在查询非主营业务净利润预算数据: period=${year}`);
+                
+                const [budgetRows] = await pool.execute(
+                    'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
+                    ['non_main_business_net_profit_contribution', year]
+                );
+                
+                console.log('预算数据查询结果:', budgetRows);
+                
+                // 构建预算数据结构
+                const budgetData = [
+                    { id: 1, name: '固废收入', yearlyPlan: 0, actual: 0, progress: '0.00%' },
+                    { id: 2, name: '房屋租金', yearlyPlan: 0, actual: 0, progress: '0.00%' },
+                    { id: 3, name: '利息收入', yearlyPlan: 0, actual: 0, progress: '0.00%' },
+                    { id: 4, name: '投资收益', yearlyPlan: 0, actual: 0, progress: '0.00%' },
+                    { id: 5, name: '补贴收入', yearlyPlan: 0, actual: 0, progress: '0.00%' },
+                    { id: 6, name: '其他', yearlyPlan: 0, actual: 0, progress: '0.00%' }
+                ];
+                
+                // 填充预算数据
+                budgetRows.forEach(row => {
+                    const item = budgetData.find(item => item.name === row.customer);
+                    if (item) {
+                        item.yearlyPlan = parseFloat(row.yearly_budget);
+                    }
+                });
+                
+                return res.json({
+                    success: true,
+                    data: budgetData,
+                    period: period,
+                    isDefault: true
+                });
+            } catch (budgetError) {
+                console.error('获取预算数据失败:', budgetError);
+                return res.status(404).json({ error: '未找到指定期间的数据' });
+            }
         }
         
         res.json({

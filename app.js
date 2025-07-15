@@ -105,6 +105,7 @@ const nanhuaBusinessContributionWithSelfBuiltRoutes = require('./routes/nanhuaBu
 const nanhuaBusinessProfitMarginWithSelfBuiltRoutes = require('./routes/nanhuaBusinessProfitMarginWithSelfBuilt');
 const nanhuaMainBusinessNetProfitRoutes = require('./routes/nanhuaMainBusinessNetProfit');
 const nanhuaNonMainBusinessNetProfitRoutes = require('./routes/nanhuaNonMainBusinessNetProfit');
+const nanhuaAnalysisAppendixRoutes = require('./routes/nanhua-analysis-appendix');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -217,6 +218,7 @@ app.use('/nanhua-business-contribution-with-self-built', nanhuaBusinessContribut
 app.use('/nanhua-business-profit-margin-with-self-built', nanhuaBusinessProfitMarginWithSelfBuiltRoutes);
 app.use('/nanhua-main-business-net-profit', nanhuaMainBusinessNetProfitRoutes);
 app.use('/nanhua-non-main-business-net-profit', nanhuaNonMainBusinessNetProfitRoutes);
+app.use('/nanhua-analysis-appendix', nanhuaAnalysisAppendixRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

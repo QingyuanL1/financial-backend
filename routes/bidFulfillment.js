@@ -9,14 +9,14 @@ router.get('/:period', createBudgetMiddleware('bid_fulfillment_status'), async (
         const { period } = req.params;
         
         const query = `
-            SELECT category, customer_type, initial_amount, current_amount 
-            FROM bid_fulfillment 
-            WHERE period = ? 
-            ORDER BY 
-                CASE category 
-                    WHEN '设备' THEN 1 
-                    WHEN '元件' THEN 2 
-                    WHEN '工程' THEN 3 
+            SELECT category, customer_type, yearly_plan, current_change, cumulative_amount
+            FROM bid_fulfillment
+            WHERE period = ?
+            ORDER BY
+                CASE category
+                    WHEN '设备' THEN 1
+                    WHEN '元件' THEN 2
+                    WHEN '工程' THEN 3
                 END,
                 id
         `;
@@ -27,24 +27,24 @@ router.get('/:period', createBudgetMiddleware('bid_fulfillment_status'), async (
             // 没有数据时，返回空的数据结构，让中间件填充预算数据
             const data = {
                 equipment: [
-                    { customerType: '上海', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '国网', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '江苏', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '输配电内配', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '西门子', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '同业', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '用户', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '其它', initialAmount: 0, currentAmount: 0 }
+                    { customerType: '上海', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '国网', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '江苏', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '输配电内配', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '西门子', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '同业', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '用户', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '其它', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 }
                 ],
                 component: [
-                    { customerType: '用户', initialAmount: 0, currentAmount: 0 }
+                    { customerType: '用户', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 }
                 ],
                 project: [
-                    { customerType: '一包', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '二包', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '域内合作', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '域外合作', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '其它', initialAmount: 0, currentAmount: 0 }
+                    { customerType: '一包', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '二包', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '域内合作', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '域外合作', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 },
+                    { customerType: '其它', yearlyPlan: 0, currentChange: 0, cumulativeAmount: 0 }
                 ]
             };
             
@@ -59,18 +59,21 @@ router.get('/:period', createBudgetMiddleware('bid_fulfillment_status'), async (
         const data = {
             equipment: rows.filter(row => row.category === '设备').map(row => ({
                 customerType: row.customer_type,
-                initialAmount: parseFloat(row.initial_amount),
-                currentAmount: parseFloat(row.current_amount)
+                yearlyPlan: parseFloat(row.yearly_plan) || 0,
+                currentChange: parseFloat(row.current_change) || 0,
+                cumulativeAmount: parseFloat(row.cumulative_amount) || 0
             })),
             component: rows.filter(row => row.category === '元件').map(row => ({
                 customerType: row.customer_type,
-                initialAmount: parseFloat(row.initial_amount),
-                currentAmount: parseFloat(row.current_amount)
+                yearlyPlan: parseFloat(row.yearly_plan) || 0,
+                currentChange: parseFloat(row.current_change) || 0,
+                cumulativeAmount: parseFloat(row.cumulative_amount) || 0
             })),
             project: rows.filter(row => row.category === '工程').map(row => ({
                 customerType: row.customer_type,
-                initialAmount: parseFloat(row.initial_amount),
-                currentAmount: parseFloat(row.current_amount)
+                yearlyPlan: parseFloat(row.yearly_plan) || 0,
+                currentChange: parseFloat(row.current_change) || 0,
+                cumulativeAmount: parseFloat(row.cumulative_amount) || 0
             }))
         };
         

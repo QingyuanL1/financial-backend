@@ -3,7 +3,7 @@ const { pool } = require('../config/database');
 const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
-// 获取非主营业务情况数据
+// 获取非主营业务情况数据（含累计计算）
 router.get('/:period', createBudgetMiddleware('non_main_business'), async (req, res) => {
     const { period } = req.params;
     
@@ -13,33 +13,78 @@ router.get('/:period', createBudgetMiddleware('non_main_business'), async (req, 
     }
     
     try {
-        const [rows] = await pool.execute(
+        // 获取当前期间的数据
+        const [currentRows] = await pool.execute(
             'SELECT * FROM non_main_business WHERE period = ? ORDER BY created_at DESC LIMIT 1',
             [period]
         );
         
-        if (rows.length === 0) {
-            return res.status(404).json({ error: '未找到指定期间的数据' });
+        // 解析当前期间数据
+        let currentData = [];
+        if (currentRows.length > 0) {
+            try {
+                currentData = typeof currentRows[0].data === 'string' ? JSON.parse(currentRows[0].data) : currentRows[0].data;
+            } catch (e) {
+                console.error('JSON解析失败:', e);
+                currentData = currentRows[0].data;
+            }
         }
         
-        console.log('非主营业务数据类型:', typeof rows[0].data);
-        console.log('非主营业务数据内容:', rows[0].data);
+        // 计算累计值：获取从年初到当前期间的所有数据
+        const [year] = period.split('-');
+        const [cumulativeRows] = await pool.execute(
+            'SELECT period, data FROM non_main_business WHERE period >= ? AND period <= ? ORDER BY period',
+            [`${year}-01`, period]
+        );
         
-        // 解析JSON字符串数据
-        let parsedData;
-        try {
-            parsedData = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
-            console.log('解析后的数据:', parsedData);
-        } catch (e) {
-            console.error('JSON解析失败:', e);
-            parsedData = rows[0].data;
+        // 计算累计值
+        const cumulativeData = {};
+        cumulativeRows.forEach(row => {
+            try {
+                const periodData = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+                if (Array.isArray(periodData)) {
+                    periodData.forEach(item => {
+                        const key = `${item.category}-${item.id}`;
+                        if (!cumulativeData[key]) {
+                            cumulativeData[key] = {
+                                id: item.id,
+                                category: item.category,
+                                yearlyPlan: item.yearlyPlan || 0,
+                                currentPeriod: 0,
+                                cumulative: 0
+                            };
+                        }
+                        cumulativeData[key].cumulative += Number(item.currentPeriod || item.currentTotal || 0);
+                    });
+                }
+            } catch (e) {
+                console.error('累计计算时JSON解析失败:', e);
+            }
+        });
+        
+        // 合并当前期间数据和累计数据
+        const finalData = currentData.map(item => {
+            const key = `${item.category}-${item.id}`;
+            const cumulativeItem = cumulativeData[key];
+            
+            return {
+                id: item.id,
+                category: item.category,
+                yearlyPlan: item.yearlyPlan || 0,
+                currentPeriod: Number(item.currentPeriod || item.currentTotal || 0),
+                cumulative: cumulativeItem ? cumulativeItem.cumulative : Number(item.currentPeriod || item.currentTotal || 0)
+            };
+        });
+        
+        if (finalData.length === 0) {
+            return res.status(404).json({ error: '未找到指定期间的数据' });
         }
         
         res.json({
             success: true,
-            data: parsedData,
-            period: rows[0].period,
-            updated_at: rows[0].updated_at
+            data: finalData,
+            period: period,
+            updated_at: currentRows.length > 0 ? currentRows[0].updated_at : null
         });
         
     } catch (error) {

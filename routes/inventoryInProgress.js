@@ -9,7 +9,7 @@ router.get('/:period', createBudgetMiddleware('work_in_progress'), async (req, r
         const { period } = req.params;
         
         const query = `
-            SELECT category, customer_type, initial_amount, current_amount 
+            SELECT category, customer_type, monthly_income 
             FROM inventory_in_progress 
             WHERE period = ? 
             ORDER BY 
@@ -27,24 +27,24 @@ router.get('/:period', createBudgetMiddleware('work_in_progress'), async (req, r
             // 没有数据时，返回空的数据结构，让中间件填充预算数据
             const data = {
                 equipment: [
-                    { customerType: '上海', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '国网', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '江苏', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '输配电内配', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '西门子', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '同业', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '用户', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '其它', initialAmount: 0, currentAmount: 0 }
+                    { customerType: '上海', monthlyIncome: 0 },
+                    { customerType: '国网', monthlyIncome: 0 },
+                    { customerType: '江苏', monthlyIncome: 0 },
+                    { customerType: '输配电内配', monthlyIncome: 0 },
+                    { customerType: '西门子', monthlyIncome: 0 },
+                    { customerType: '同业', monthlyIncome: 0 },
+                    { customerType: '用户', monthlyIncome: 0 },
+                    { customerType: '其它', monthlyIncome: 0 }
                 ],
                 component: [
-                    { customerType: '用户', initialAmount: 0, currentAmount: 0 }
+                    { customerType: '用户', monthlyIncome: 0 }
                 ],
                 project: [
-                    { customerType: '一包', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '二包', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '域内合作', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '域外合作', initialAmount: 0, currentAmount: 0 },
-                    { customerType: '其它', initialAmount: 0, currentAmount: 0 }
+                    { customerType: '一包', monthlyIncome: 0 },
+                    { customerType: '二包', monthlyIncome: 0 },
+                    { customerType: '域内合作', monthlyIncome: 0 },
+                    { customerType: '域外合作', monthlyIncome: 0 },
+                    { customerType: '其它', monthlyIncome: 0 }
                 ]
             };
             
@@ -59,18 +59,15 @@ router.get('/:period', createBudgetMiddleware('work_in_progress'), async (req, r
         const data = {
             equipment: rows.filter(row => row.category === '设备').map(row => ({
                 customerType: row.customer_type,
-                initialAmount: parseFloat(row.initial_amount),
-                currentAmount: parseFloat(row.current_amount)
+                monthlyIncome: parseFloat(row.monthly_income)
             })),
             component: rows.filter(row => row.category === '元件').map(row => ({
                 customerType: row.customer_type,
-                initialAmount: parseFloat(row.initial_amount),
-                currentAmount: parseFloat(row.current_amount)
+                monthlyIncome: parseFloat(row.monthly_income)
             })),
             project: rows.filter(row => row.category === '工程').map(row => ({
                 customerType: row.customer_type,
-                initialAmount: parseFloat(row.initial_amount),
-                currentAmount: parseFloat(row.current_amount)
+                monthlyIncome: parseFloat(row.monthly_income)
             }))
         };
         

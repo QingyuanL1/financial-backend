@@ -19,7 +19,13 @@ router.get('/:period', createBudgetMiddleware('payment_structure_quality'), asyn
         );
         
         if (rows.length === 0) {
-            return res.status(404).json({ error: '未找到指定期间的数据' });
+            // 没有数据时返回空数组，让预算中间件附加预算信息
+            return res.json({
+                success: true,
+                data: [],
+                period: period,
+                message: '该期间暂无数据，已加载预算信息'
+            });
         }
         
         res.json({

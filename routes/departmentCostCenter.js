@@ -1,9 +1,10 @@
 const express = require('express');
 const { pool } = require('../config/database');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 获取指定期间的部门成本中心实际发生情况
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('department_cost_center_actual'), async (req, res) => {
   try {
     const { period } = req.params;
 

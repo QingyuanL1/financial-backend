@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
+const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
 // 数据库连接池
@@ -91,7 +92,7 @@ router.post('/', async (req, res) => {
 });
 
 // 获取预算执行数据
-router.get('/:period', async (req, res) => {
+router.get('/:period', createBudgetMiddleware('budget_execution'), async (req, res) => {
   try {
     const { period } = req.params;
 
@@ -109,9 +110,16 @@ router.get('/:period', async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: '未找到该期间的数据'
+      // 没有数据时返回空数据结构，让预算中间件附加预算信息
+      return res.json({
+        success: true,
+        data: {
+          equipment: [],
+          components: [],
+          engineering: []
+        },
+        period: period,
+        message: '该期间暂无数据，已加载预算信息'
       });
     }
 

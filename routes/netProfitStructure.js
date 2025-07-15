@@ -3,7 +3,7 @@ const { pool } = require('../config/database');
 const { createBudgetMiddleware } = require('../middleware/budgetMiddleware');
 const router = express.Router();
 
-// 获取净利润结构数据
+// 获取净利润结构数据（含累计计算）
 router.get('/:period', createBudgetMiddleware('net_profit_structure_quality'), async (req, res) => {
     const { period } = req.params;
     
@@ -13,109 +13,114 @@ router.get('/:period', createBudgetMiddleware('net_profit_structure_quality'), a
     }
     
     try {
-        const [rows] = await pool.execute(
+        // 获取当前期间的数据
+        const [currentRows] = await pool.execute(
             'SELECT * FROM net_profit_structure WHERE period = ? ORDER BY created_at DESC LIMIT 1',
             [period]
         );
         
-        if (rows.length === 0) {
-            // 没有数据时，获取预算数据并返回默认结构
-            try {
-                const year = period.split('-')[0];
-                console.log(`正在查询预算数据: table_key=net_profit_structure_quality, period=${year}`);
-                
-                const [budgetRows] = await pool.execute(
-                    'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
-                    ['net_profit_structure_quality', year]
-                );
-                
-                console.log('预算数据查询结果:', budgetRows);
-                
-                let mainBusinessPlan = '0';
-                let nonMainBusinessPlan = '0';
-                
-                budgetRows.forEach(row => {
-                    console.log(`处理预算行: customer=${row.customer}, yearly_budget=${row.yearly_budget}`);
-                    if (row.customer === '主营业务') {
-                        mainBusinessPlan = row.yearly_budget.toString();
-                    } else if (row.customer === '非主营业务') {
-                        nonMainBusinessPlan = row.yearly_budget.toString();
-                    }
-                });
-                
-                // 计算总计划
-                const totalPlan = (parseFloat(mainBusinessPlan) + parseFloat(nonMainBusinessPlan)).toFixed(2);
-                
-                const budgetData = {
-                    mainBusiness: { plan: mainBusinessPlan, actual: '0', progress: '0.00%' },
-                    nonMainBusiness: { plan: nonMainBusinessPlan, actual: '0', progress: '0.00%' },
-                    total: { plan: totalPlan, actual: '0', progress: '0.00%' }
-                };
-                
-                console.log('最终预算数据:', budgetData);
-                
-                return res.json({
-                    success: true,
-                    data: budgetData,
-                    period: period,
-                    isDefault: true
-                });
-            } catch (budgetError) {
-                console.error('获取预算数据失败:', budgetError);
-                // 即使预算数据查询失败，也返回默认结构而不是404
-                const defaultBudgetData = {
-                    mainBusiness: { plan: '0', actual: '0', progress: '0.00%' },
-                    nonMainBusiness: { plan: '0', actual: '0', progress: '0.00%' },
-                    total: { plan: '0', actual: '0', progress: '0.00%' }
-                };
-                
-                return res.json({
-                    success: true,
-                    data: defaultBudgetData,
-                    period: period,
-                    isDefault: true
-                });
+        // 获取预算数据
+        const year = period.split('-')[0];
+        const [budgetRows] = await pool.execute(
+            'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
+            ['net_profit_structure_quality', year]
+        );
+        
+        let mainBusinessPlan = '0';
+        let nonMainBusinessPlan = '0';
+        
+        budgetRows.forEach(row => {
+            if (row.customer === '主营业务') {
+                mainBusinessPlan = row.yearly_budget.toString();
+            } else if (row.customer === '非主营业务') {
+                nonMainBusinessPlan = row.yearly_budget.toString();
             }
-        }
+        });
         
-        // 有数据时，也需要确保预算数据被包含
-        let responseData = rows[0].data;
+        // 计算累计值：获取从年初到当前期间的所有数据
+        const [cumulativeRows] = await pool.execute(
+            'SELECT period, data FROM net_profit_structure WHERE period >= ? AND period <= ? ORDER BY period',
+            [`${year}-01`, period]
+        );
         
-        // 如果是字符串，先解析
-        if (typeof responseData === 'string') {
+        let mainBusinessCumulative = 0;
+        let nonMainBusinessCumulative = 0;
+        
+        cumulativeRows.forEach(row => {
             try {
-                responseData = JSON.parse(responseData);
+                const periodData = typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+                if (periodData) {
+                    mainBusinessCumulative += parseFloat(periodData.mainBusiness?.current || periodData.mainBusiness?.actual || 0);
+                    nonMainBusinessCumulative += parseFloat(periodData.nonMainBusiness?.current || periodData.nonMainBusiness?.actual || 0);
+                }
             } catch (e) {
-                console.error('JSON解析失败:', e);
+                console.error('累计计算时JSON解析失败:', e);
             }
-        }
+        });
         
-        // 确保预算数据存在，如果不存在则从数据库获取
-        if (!responseData.mainBusiness?.plan || responseData.mainBusiness.plan === '0') {
-            try {
-                const year = period.split('-')[0];
-                const [budgetRows] = await pool.execute(
-                    'SELECT category, customer, yearly_budget FROM budget_planning WHERE table_key = ? AND period = ?',
-                    ['net_profit_structure_quality', year]
-                );
-                
-                budgetRows.forEach(row => {
-                    if (row.customer === '主营业务' && responseData.mainBusiness) {
-                        responseData.mainBusiness.plan = row.yearly_budget.toString();
-                    } else if (row.customer === '非主营业务' && responseData.nonMainBusiness) {
-                        responseData.nonMainBusiness.plan = row.yearly_budget.toString();
-                    }
-                });
-            } catch (budgetError) {
-                console.error('获取预算数据失败:', budgetError);
+        // 构建响应数据
+        let responseData;
+        if (currentRows.length === 0) {
+            // 没有当前期间数据，返回默认结构
+            responseData = {
+                mainBusiness: { 
+                    plan: mainBusinessPlan, 
+                    current: '0', 
+                    cumulative: mainBusinessCumulative.toFixed(2),
+                    progress: '0.00%' 
+                },
+                nonMainBusiness: { 
+                    plan: nonMainBusinessPlan, 
+                    current: '0', 
+                    cumulative: nonMainBusinessCumulative.toFixed(2),
+                    progress: '0.00%' 
+                },
+                total: { 
+                    plan: (parseFloat(mainBusinessPlan) + parseFloat(nonMainBusinessPlan)).toFixed(2), 
+                    current: '0', 
+                    cumulative: (mainBusinessCumulative + nonMainBusinessCumulative).toFixed(2),
+                    progress: '0.00%' 
+                }
+            };
+        } else {
+            // 有当前期间数据，合并当前期间和累计数据
+            let currentData = currentRows[0].data;
+            if (typeof currentData === 'string') {
+                try {
+                    currentData = JSON.parse(currentData);
+                } catch (e) {
+                    console.error('JSON解析失败:', e);
+                    currentData = {};
+                }
             }
+            
+            responseData = {
+                mainBusiness: {
+                    plan: mainBusinessPlan,
+                    current: currentData.mainBusiness?.current || currentData.mainBusiness?.actual || '0',
+                    cumulative: mainBusinessCumulative.toFixed(2),
+                    progress: currentData.mainBusiness?.progress || '0.00%'
+                },
+                nonMainBusiness: {
+                    plan: nonMainBusinessPlan,
+                    current: currentData.nonMainBusiness?.current || currentData.nonMainBusiness?.actual || '0',
+                    cumulative: nonMainBusinessCumulative.toFixed(2),
+                    progress: currentData.nonMainBusiness?.progress || '0.00%'
+                },
+                total: {
+                    plan: (parseFloat(mainBusinessPlan) + parseFloat(nonMainBusinessPlan)).toFixed(2),
+                    current: currentData.total?.current || currentData.total?.actual || '0',
+                    cumulative: (mainBusinessCumulative + nonMainBusinessCumulative).toFixed(2),
+                    progress: currentData.total?.progress || '0.00%'
+                }
+            };
         }
         
         res.json({
             success: true,
             data: responseData,
-            period: rows[0].period,
-            updated_at: rows[0].updated_at
+            period: period,
+            updated_at: currentRows.length > 0 ? currentRows[0].updated_at : null
         });
         
     } catch (error) {

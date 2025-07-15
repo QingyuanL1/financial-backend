@@ -21,20 +21,21 @@ router.get('/:period', createBudgetMiddleware('department_cost_center_profit_los
       // 没有数据时，返回空的数据结构，让中间件填充预算数据
       const emptyData = {
         departments: [
-          { department: '总经理室', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '企管部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '财务部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '销售部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '市场部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '营运部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '研技部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: 'C-GIS 事业部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
-          { department: '工程事业部', yearlyBudget: '', currentTotal: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' }
+          { department: '总经理室', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '企管部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '财务部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '销售部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '市场部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '营运部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '研技部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: 'C-GIS 事业部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' },
+          { department: '工程事业部', yearlyBudget: '', currentMonthIncome: '', accumulatedIncome: '', executionProgress: '', budgetToOutputRatio: '', actualToOutputRatio: '' }
         ],
         total: {
           department: '合计',
           yearlyBudget: '',
-          currentTotal: '',
+          currentMonthIncome: '',
+          accumulatedIncome: '',
           executionProgress: '',
           budgetToOutputRatio: '',
           actualToOutputRatio: ''

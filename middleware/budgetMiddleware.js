@@ -216,8 +216,22 @@ function createBudgetMiddleware(tableKey) {
                     // 根据数据结构附加预算信息
                     if (Array.isArray(parsedData)) {
                         console.log(`处理数组数据，共${parsedData.length}项`);
-                        console.log(`第一项数据结构:`, parsedData[0]);
+                        if (parsedData.length > 0) {
+                            console.log(`第一项数据结构:`, parsedData[0]);
+                        }
                         console.log(`budgetMap内容:`, budgetMap);
+
+                        // 如果是收款结构质量且数据为空，生成预算数据
+                        if (parsedData.length === 0 && tableKey === 'payment_structure_quality') {
+                            console.log('数据为空，为收款结构质量生成预算数据');
+                            parsedData = generateReceiptStructureBudgetData(budgetMap);
+                        }
+
+                        // 如果是预算执行且数据为空，生成预算数据
+                        if (parsedData.length === 0 && tableKey === 'budget_execution') {
+                            console.log('数据为空，为预算执行生成预算数据');
+                            parsedData = generateBudgetExecutionData(budgetMap);
+                        }
                         
                         // 针对非主营业务的特殊处理
                         if (tableKey === 'non_main_business') {
@@ -341,6 +355,34 @@ function createBudgetMiddleware(tableKey) {
                                             };
                                         } else {
                                             console.log(`❌ 成本暂估匹配失败: ${budgetKey}`);
+                                        }
+                                        return item;
+                                    });
+                                }
+                            });
+                        } else if (tableKey === 'budget_execution') {
+                            // 特殊处理预算执行数据
+                            console.log(`🔍 处理预算执行数据，table_key: ${tableKey}`);
+                            console.log(`📊 可用的预算数据键值:`, Object.keys(budgetMap));
+
+                            ['equipment', 'components', 'engineering'].forEach(category => {
+                                if (parsedData[category] && Array.isArray(parsedData[category])) {
+                                    const categoryName = category === 'equipment' ? '设备' :
+                                                       category === 'components' ? '元件' : '工程';
+
+                                    console.log(`📝 处理 ${categoryName} 类别，共 ${parsedData[category].length} 项`);
+                                    parsedData[category] = parsedData[category].map(item => {
+                                        const budgetKey = `${categoryName}-${item.customer}`;
+                                        console.log(`🔍 尝试匹配: ${budgetKey}`);
+                                        if (budgetMap[budgetKey] !== undefined) {
+                                            const budget = budgetMap[budgetKey];
+                                            console.log(`✅ 预算执行匹配成功: ${budgetKey} -> 预算: ${budget}`);
+                                            return {
+                                                ...item,
+                                                yearlyPlan: budget
+                                            };
+                                        } else {
+                                            console.log(`❌ 预算执行匹配失败: ${budgetKey}`);
                                         }
                                         return item;
                                     });
@@ -804,6 +846,86 @@ function getCustomerNameFromKey(customerKey) {
     };
     
     return keyMap[customerKey] || customerKey;
+}
+
+/**
+ * 为收款结构质量生成预算数据
+ * 当实际数据为空时，根据预算数据生成基础结构
+ */
+function generateReceiptStructureBudgetData(budgetMap) {
+    const budgetData = [];
+
+    // 定义收款结构的基础客户类型
+    const customerTypes = {
+        '设备': ['上海', '国网', '江苏', '输配电内配', '西门子', '同业', '用户', '其它'],
+        '元件': ['用户'],
+        '工程': ['一包', '二包', '域内合作', '域外合作', '其它']
+    };
+
+    // 为每个板块和客户类型生成预算数据
+    Object.keys(customerTypes).forEach(segment => {
+        customerTypes[segment].forEach(customerType => {
+            const budgetKey = `${segment}-${customerType}`;
+            const yearlyPlan = budgetMap[budgetKey] || 0;
+
+            if (yearlyPlan > 0) {
+                budgetData.push({
+                    segment: segment,
+                    customerType: customerType,
+                    yearlyPlan: yearlyPlan,
+                    currentReceipt: '0',
+                    actual: '0',
+                    progress: '0.00%'
+                });
+            }
+        });
+    });
+
+    console.log(`生成的收款结构预算数据:`, budgetData);
+    return budgetData;
+}
+
+/**
+ * 为预算执行生成预算数据
+ * 当实际数据为空时，根据预算数据生成基础结构
+ */
+function generateBudgetExecutionData(budgetMap) {
+    const budgetData = {
+        equipment: [],
+        components: [],
+        engineering: []
+    };
+
+    // 定义预算执行的基础客户类型
+    const customerTypes = {
+        '设备': ['上海', '国网', '江苏', '输配电内配', '西门子', '同业', '用户', '其它'],
+        '元件': ['用户'],
+        '工程': ['一包', '二包', '域内合作', '域外合作', '其它']
+    };
+
+    // 为每个类别和客户类型生成预算数据
+    Object.keys(customerTypes).forEach(category => {
+        const categoryKey = category === '设备' ? 'equipment' :
+                           category === '元件' ? 'components' : 'engineering';
+
+        customerTypes[category].forEach(customer => {
+            const budgetKey = `${category}-${customer}`;
+            const yearlyPlan = budgetMap[budgetKey] || 0;
+
+            if (yearlyPlan > 0) {
+                budgetData[categoryKey].push({
+                    customer: customer,
+                    yearlyPlan: yearlyPlan,
+                    currentMonth: 0,
+                    currentTotal: 0,
+                    progress: 0
+                });
+            }
+        });
+    });
+
+    console.log(`生成的预算执行数据:`, budgetData);
+    return budgetData;
 }
 
 /**

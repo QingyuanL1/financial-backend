@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS tuoyuan_accounts_receivable (
 
 -- 初始化基础数据
 INSERT INTO tuoyuan_accounts_receivable (period, segment_attribute, customer_attribute, year_beginning_balance, current_invoicing, cumulative_invoicing, current_collection, cumulative_collection, current_receivable_balance) VALUES
-('2024-01', '设备', '申业项目', 0, 0, 0, 0, 0, 0),
+('2024-01', '设备', '电业项目', 0, 0, 0, 0, 0, 0),
 ('2024-01', '设备', '用户项目', 0, 0, 0, 0, 0, 0),
 ('2024-01', '设备', '贸易', 0, 0, 0, 0, 0, 0),
 ('2024-01', '设备', '代理设备', 0, 0, 0, 0, 0, 0),

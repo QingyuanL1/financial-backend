@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS tuoyuan_main_business_cost_structure_quality (
 
 -- 初始化基础数据
 INSERT INTO tuoyuan_main_business_cost_structure_quality (period, segment_attribute, customer_attribute, yearly_plan, current_period, yearly_accumulated, yearly_plan_completion_rate, cumulative_ratio) VALUES
-('2024-01', '设备', '申业项目', 0, 0, 0, 0, 0),
+('2024-01', '设备', '电业项目', 0, 0, 0, 0, 0),
 ('2024-01', '设备', '用户项目', 0, 0, 0, 0, 0),
 ('2024-01', '设备', '贸易', 0, 0, 0, 0, 0),
 ('2024-01', '设备', '代理设备', 0, 0, 0, 0, 0),

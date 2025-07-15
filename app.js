@@ -134,6 +134,11 @@ const tuoyuanMainBusinessProfitMarginRoutes = require('./routes/tuoyuan-main-bus
 const tuoyuanPaymentStructureQualityRoutes = require('./routes/tuoyuan-payment-structure-quality');
 const tuoyuanAccountsReceivableRoutes = require('./routes/tuoyuan-accounts-receivable');
 const tuoyuanOverdueReceivablesRoutes = require('./routes/tuoyuan-overdue-receivables');
+const tuoyuanBadDebtProvisionRoutes = require('./routes/tuoyuan-bad-debt-provision');
+const tuoyuanConstructionPlanExecutionRoutes = require('./routes/tuoyuan-construction-plan-execution');
+const tuoyuanMajorInvestmentRoutes = require('./routes/tuoyuan-major-investment');
+const tuoyuanMainBusinessProductionValueSelfConstructionRoutes = require('./routes/tuoyuan-main-business-production-value-self-construction');
+const tuoyuanConstructionExecutionStatusRoutes = require('./routes/tuoyuan-construction-execution-status');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -275,6 +280,11 @@ app.use('/tuoyuan-main-business-profit-margin', tuoyuanMainBusinessProfitMarginR
 app.use('/tuoyuan-payment-structure-quality', tuoyuanPaymentStructureQualityRoutes);
 app.use('/tuoyuan-accounts-receivable', tuoyuanAccountsReceivableRoutes);
 app.use('/tuoyuan-overdue-receivables', tuoyuanOverdueReceivablesRoutes);
+app.use('/tuoyuan-bad-debt-provision', tuoyuanBadDebtProvisionRoutes);
+app.use('/tuoyuan-construction-plan-execution', tuoyuanConstructionPlanExecutionRoutes);
+app.use('/tuoyuan-major-investment', tuoyuanMajorInvestmentRoutes);
+app.use('/tuoyuan-main-business-production-value-self-construction', tuoyuanMainBusinessProductionValueSelfConstructionRoutes);
+app.use('/tuoyuan-construction-execution-status', tuoyuanConstructionExecutionStatusRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

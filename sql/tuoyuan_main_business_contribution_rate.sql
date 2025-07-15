@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS tuoyuan_main_business_contribution_rate (
 
 -- 初始化基础数据
 INSERT INTO tuoyuan_main_business_contribution_rate (period, segment_attribute, customer_attribute, yearly_plan, current_actual, deviation) VALUES
-('2024-01', '设备', '申业项目', 15.47, 0, 0),
+('2024-01', '设备', '电业项目', 15.47, 0, 0),
 ('2024-01', '设备', '用户项目', 0, 0, 0),
 ('2024-01', '设备', '贸易', 6.00, 0, 0),
 ('2024-01', '设备', '代理设备', 26.67, 0, 0),

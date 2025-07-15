@@ -106,6 +106,34 @@ const nanhuaBusinessProfitMarginWithSelfBuiltRoutes = require('./routes/nanhuaBu
 const nanhuaMainBusinessNetProfitRoutes = require('./routes/nanhuaMainBusinessNetProfit');
 const nanhuaNonMainBusinessNetProfitRoutes = require('./routes/nanhuaNonMainBusinessNetProfit');
 const nanhuaAnalysisAppendixRoutes = require('./routes/nanhua-analysis-appendix');
+const nanhuaOverdueReceivablesRoutes = require('./routes/nanhua-overdue-receivables');
+const nanhuaBadDebtProvisionRoutes = require('./routes/nanhua-bad-debt-provision');
+const nanhuaSelfConstructionAnalysisRoutes = require('./routes/nanhua-self-construction-analysis');
+const nanhuaConstructionPlanExecutionRoutes = require('./routes/nanhua-construction-plan-execution');
+const nanhuaConstructionExecutionStatusRoutes = require('./routes/nanhua-construction-execution-status');
+const nanhuaMajorInvestmentRoutes = require('./routes/nanhua-major-investment');
+
+// 拓源公司专用路由
+const tuoyuanNewOrderStructureRoutes = require('./routes/tuoyuan-new-order-structure');
+const tuoyuanProjectTrackingRoutes = require('./routes/tuoyuan-project-tracking');
+const tuoyuanBiddingStatusRoutes = require('./routes/tuoyuan-bidding-status');
+const tuoyuanOrderToIncomeRoutes = require('./routes/tuoyuan-order-to-income');
+const tuoyuanMainBusinessIncomeBreakdownRoutes = require('./routes/tuoyuan-main-business-income-breakdown');
+const tuoyuanStockOrderToIncomeRoutes = require('./routes/tuoyuan-stock-order-to-income');
+const tuoyuanNonMainBusinessRoutes = require('./routes/tuoyuan-non-main-business');
+const tuoyuanInventoryStructureRoutes = require('./routes/tuoyuan-inventory-structure');
+const tuoyuanBidFulfillmentRoutes = require('./routes/tuoyuan-bid-fulfillment');
+const tuoyuanInventoryInProgressRoutes = require('./routes/tuoyuan-inventory-in-progress');
+const tuoyuanInventoryStatusRoutes = require('./routes/tuoyuan-inventory-status');
+const tuoyuanMainBusinessCostStructureQualityRoutes = require('./routes/tuoyuan-main-business-cost-structure-quality');
+const tuoyuanCostEstimationRoutes = require('./routes/tuoyuan-cost-estimation');
+const tuoyuanCostCenterProfitLossRoutes = require('./routes/tuoyuan-cost-center-profit-loss');
+const tuoyuanMainBusinessContributionRateRoutes = require('./routes/tuoyuan-main-business-contribution-rate');
+const tuoyuanMainBusinessNetProfitContributionRoutes = require('./routes/tuoyuan-main-business-net-profit-contribution');
+const tuoyuanMainBusinessProfitMarginRoutes = require('./routes/tuoyuan-main-business-profit-margin');
+const tuoyuanPaymentStructureQualityRoutes = require('./routes/tuoyuan-payment-structure-quality');
+const tuoyuanAccountsReceivableRoutes = require('./routes/tuoyuan-accounts-receivable');
+const tuoyuanOverdueReceivablesRoutes = require('./routes/tuoyuan-overdue-receivables');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -219,6 +247,34 @@ app.use('/nanhua-business-profit-margin-with-self-built', nanhuaBusinessProfitMa
 app.use('/nanhua-main-business-net-profit', nanhuaMainBusinessNetProfitRoutes);
 app.use('/nanhua-non-main-business-net-profit', nanhuaNonMainBusinessNetProfitRoutes);
 app.use('/nanhua-analysis-appendix', nanhuaAnalysisAppendixRoutes);
+app.use('/nanhua-overdue-receivables', nanhuaOverdueReceivablesRoutes);
+app.use('/nanhua-bad-debt-provision', nanhuaBadDebtProvisionRoutes);
+app.use('/nanhua-self-construction-analysis', nanhuaSelfConstructionAnalysisRoutes);
+app.use('/nanhua-construction-plan-execution', nanhuaConstructionPlanExecutionRoutes);
+app.use('/nanhua-construction-execution-status', nanhuaConstructionExecutionStatusRoutes);
+app.use('/nanhua-major-investment', nanhuaMajorInvestmentRoutes);
+
+// 拓源公司专用路由
+app.use('/tuoyuan-new-order-structure', tuoyuanNewOrderStructureRoutes);
+app.use('/tuoyuan-project-tracking', tuoyuanProjectTrackingRoutes);
+app.use('/tuoyuan-bidding-status', tuoyuanBiddingStatusRoutes);
+app.use('/tuoyuan-order-to-income', tuoyuanOrderToIncomeRoutes);
+app.use('/tuoyuan-main-business-income-breakdown', tuoyuanMainBusinessIncomeBreakdownRoutes);
+app.use('/tuoyuan-stock-order-to-income', tuoyuanStockOrderToIncomeRoutes);
+app.use('/tuoyuan-non-main-business', tuoyuanNonMainBusinessRoutes);
+app.use('/tuoyuan-inventory-structure', tuoyuanInventoryStructureRoutes);
+app.use('/tuoyuan-bid-fulfillment', tuoyuanBidFulfillmentRoutes);
+app.use('/tuoyuan-inventory-in-progress', tuoyuanInventoryInProgressRoutes);
+app.use('/tuoyuan-inventory-status', tuoyuanInventoryStatusRoutes);
+app.use('/tuoyuan-main-business-cost-structure-quality', tuoyuanMainBusinessCostStructureQualityRoutes);
+app.use('/tuoyuan-cost-estimation', tuoyuanCostEstimationRoutes);
+app.use('/tuoyuan-cost-center-profit-loss', tuoyuanCostCenterProfitLossRoutes);
+app.use('/tuoyuan-main-business-contribution-rate', tuoyuanMainBusinessContributionRateRoutes);
+app.use('/tuoyuan-main-business-net-profit-contribution', tuoyuanMainBusinessNetProfitContributionRoutes);
+app.use('/tuoyuan-main-business-profit-margin', tuoyuanMainBusinessProfitMarginRoutes);
+app.use('/tuoyuan-payment-structure-quality', tuoyuanPaymentStructureQualityRoutes);
+app.use('/tuoyuan-accounts-receivable', tuoyuanAccountsReceivableRoutes);
+app.use('/tuoyuan-overdue-receivables', tuoyuanOverdueReceivablesRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

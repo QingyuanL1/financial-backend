@@ -67,6 +67,8 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
     const { moduleId, period, userId, description } = req.body;
 
+    console.log('上传文件参数:', { moduleId, period, userId, description });
+
     if (!moduleId || !period || !userId) {
       return res.status(400).json({
         success: false,

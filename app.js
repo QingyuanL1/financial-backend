@@ -82,6 +82,12 @@ const notificationsRoutes = require('./routes/notifications');
 // 年度预算计划路由
 const budgetPlanningRoutes = require('./routes/budgetPlanning');
 
+// 南华公司专用路由
+const nanhuaNewOrdersRoutes = require('./routes/nanhuaNewOrders');
+const nanhuaProjectTrackingRoutes = require('./routes/nanhuaProjectTracking');
+const nanhuaBiddingStatusRoutes = require('./routes/nanhuaBiddingStatus');
+const nanhuaBusinessIncomeRoutes = require('./routes/nanhuaBusinessIncome');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -169,6 +175,12 @@ app.use('/notifications', notificationsRoutes);
 
 // 年度预算计划路由
 app.use('/budget-planning', budgetPlanningRoutes);
+
+// 南华公司专用路由
+app.use('/nanhua-new-orders', nanhuaNewOrdersRoutes);
+app.use('/nanhua-project-tracking', nanhuaProjectTrackingRoutes);
+app.use('/nanhua-bidding-status', nanhuaBiddingStatusRoutes);
+app.use('/nanhua-business-income', nanhuaBusinessIncomeRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

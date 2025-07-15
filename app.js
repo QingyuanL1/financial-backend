@@ -87,6 +87,11 @@ const nanhuaNewOrdersRoutes = require('./routes/nanhuaNewOrders');
 const nanhuaProjectTrackingRoutes = require('./routes/nanhuaProjectTracking');
 const nanhuaBiddingStatusRoutes = require('./routes/nanhuaBiddingStatus');
 const nanhuaBusinessIncomeRoutes = require('./routes/nanhuaBusinessIncome');
+const nanhuaOrderToIncomeRoutes = require('./routes/nanhuaOrderToIncome');
+const nanhuaNonMainBusinessRoutes = require('./routes/nanhuaNonMainBusiness');
+const nanhuaStockOrderToIncomeRoutes = require('./routes/nanhuaStockOrderToIncome');
+const nanhuaInventoryStructureRoutes = require('./routes/nanhuaInventoryStructure');
+const nanhuaBidFulfillmentRoutes = require('./routes/nanhuaBidFulfillment');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -181,6 +186,11 @@ app.use('/nanhua-new-orders', nanhuaNewOrdersRoutes);
 app.use('/nanhua-project-tracking', nanhuaProjectTrackingRoutes);
 app.use('/nanhua-bidding-status', nanhuaBiddingStatusRoutes);
 app.use('/nanhua-business-income', nanhuaBusinessIncomeRoutes);
+app.use('/nanhua-order-to-income', nanhuaOrderToIncomeRoutes);
+app.use('/nanhua-non-main-business', nanhuaNonMainBusinessRoutes);
+app.use('/nanhua-stock-order-to-income', nanhuaStockOrderToIncomeRoutes);
+app.use('/nanhua-inventory-structure', nanhuaInventoryStructureRoutes);
+app.use('/nanhua-bid-fulfillment', nanhuaBidFulfillmentRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {

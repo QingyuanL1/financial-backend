@@ -17,6 +17,37 @@ CREATE TABLE IF NOT EXISTS new_orders (
     INDEX idx_customer (customer)
 );
 
+-- 南华当年订单转收入表
+CREATE TABLE IF NOT EXISTS nanhua_order_to_income (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    period VARCHAR(7) NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    new_contract_total DECIMAL(15,2) DEFAULT 0.00,
+    current_amount DECIMAL(15,2) DEFAULT 0.00,
+    accumulated_amount DECIMAL(15,2) DEFAULT 0.00,
+    completion_rate DECIMAL(8,2) DEFAULT 0.00,
+    category VARCHAR(50) DEFAULT '工程',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_period (period),
+    INDEX idx_customer_name (customer_name),
+    INDEX idx_category (category)
+);
+
+-- 南华非主营业务情况表
+CREATE TABLE IF NOT EXISTS nanhua_non_main_business (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    period VARCHAR(7) NOT NULL,
+    financial_subject VARCHAR(100) NOT NULL,
+    annual_plan DECIMAL(15,2) DEFAULT 0.00,
+    current_cumulative DECIMAL(15,2) DEFAULT 0.00,
+    execution_progress DECIMAL(8,2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_period (period),
+    INDEX idx_financial_subject (financial_subject)
+);
+
 -- 2. 项目跟踪表 (对应 BudgetExecution.vue)
 DROP TABLE IF EXISTS project_tracking;
 CREATE TABLE project_tracking (

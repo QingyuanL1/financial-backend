@@ -92,6 +92,19 @@ const nanhuaNonMainBusinessRoutes = require('./routes/nanhuaNonMainBusiness');
 const nanhuaStockOrderToIncomeRoutes = require('./routes/nanhuaStockOrderToIncome');
 const nanhuaInventoryStructureRoutes = require('./routes/nanhuaInventoryStructure');
 const nanhuaBidFulfillmentRoutes = require('./routes/nanhuaBidFulfillment');
+const nanhuaMainBusinessCostRoutes = require('./routes/nanhuaMainBusinessCost');
+const nanhuaContractInventoryRoutes = require('./routes/nanhuaContractInventory');
+const nanhuaCostProvisionRoutes = require('./routes/nanhuaCostProvision');
+const nanhuaReceiptStructureRoutes = require('./routes/nanhuaReceiptStructure');
+const nanhuaContractInventoryEvaluationRoutes = require('./routes/nanhuaContractInventoryEvaluation');
+const nanhuaCostCenterStructureRoutes = require('./routes/nanhuaCostCenterStructure');
+const departmentCostCenterActualRoutes = require('./routes/departmentCostCenterActual');
+const nanhuaDepartmentCostCenterActualRoutes = require('./routes/nanhuaDepartmentCostCenterActual');
+const nanhuaDepartmentCostInputRoutes = require('./routes/nanhuaDepartmentCostInput');
+const nanhuaBusinessContributionWithSelfBuiltRoutes = require('./routes/nanhuaBusinessContributionWithSelfBuilt');
+const nanhuaBusinessProfitMarginWithSelfBuiltRoutes = require('./routes/nanhuaBusinessProfitMarginWithSelfBuilt');
+const nanhuaMainBusinessNetProfitRoutes = require('./routes/nanhuaMainBusinessNetProfit');
+const nanhuaNonMainBusinessNetProfitRoutes = require('./routes/nanhuaNonMainBusinessNetProfit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -191,6 +204,19 @@ app.use('/nanhua-non-main-business', nanhuaNonMainBusinessRoutes);
 app.use('/nanhua-stock-order-to-income', nanhuaStockOrderToIncomeRoutes);
 app.use('/nanhua-inventory-structure', nanhuaInventoryStructureRoutes);
 app.use('/nanhua-bid-fulfillment', nanhuaBidFulfillmentRoutes);
+app.use('/nanhua-main-business-cost', nanhuaMainBusinessCostRoutes);
+app.use('/nanhua-contract-inventory', nanhuaContractInventoryRoutes);
+app.use('/nanhua-cost-provision', nanhuaCostProvisionRoutes);
+app.use('/nanhua-receipt-structure', nanhuaReceiptStructureRoutes);
+app.use('/nanhua-contract-inventory-evaluation', nanhuaContractInventoryEvaluationRoutes);
+app.use('/nanhua-cost-center-structure', nanhuaCostCenterStructureRoutes);
+app.use('/department-cost-center-actual', departmentCostCenterActualRoutes);
+app.use('/nanhua-department-cost-center-actual', nanhuaDepartmentCostCenterActualRoutes);
+app.use('/nanhua-department-cost-input', nanhuaDepartmentCostInputRoutes);
+app.use('/nanhua-business-contribution-with-self-built', nanhuaBusinessContributionWithSelfBuiltRoutes);
+app.use('/nanhua-business-profit-margin-with-self-built', nanhuaBusinessProfitMarginWithSelfBuiltRoutes);
+app.use('/nanhua-main-business-net-profit', nanhuaMainBusinessNetProfitRoutes);
+app.use('/nanhua-non-main-business-net-profit', nanhuaNonMainBusinessNetProfitRoutes);
 
 // 健康检查
 app.get('/health', (req, res) => {
